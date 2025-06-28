@@ -12,17 +12,18 @@ def create():
             app.storage.user['count'] += 1
             counter_label.text = str(app.storage.user['count'])
         
-        # Main container with centered layout and clean background
-        with ui.column().classes('items-center justify-center min-h-screen gap-12 bg-white'):
+        # Main container with centered layout and pristine background
+        with ui.column().classes('items-center justify-center min-h-screen gap-16 bg-gray-50'):
             
-            # Counter display - large, clean typography
+            # Counter display - ultra-large, minimal typography
             counter_label = ui.label(str(app.storage.user['count'])).classes(
-                'text-9xl font-thin text-gray-900 select-none'
+                'text-[12rem] font-extralight text-gray-800 select-none tracking-tight'
             ).mark('counter-display')
             
-            # Increment button - minimal, circular design
+            # Increment button - refined, subtle design
             ui.button('', icon='add').classes(
-                'w-16 h-16 rounded-full bg-gray-100 hover:bg-gray-200 '
-                'text-gray-700 shadow-sm transition-colors duration-200 '
-                'border-0 focus:ring-2 focus:ring-gray-300'
+                'w-14 h-14 rounded-full bg-white hover:bg-gray-50 '
+                'text-gray-600 shadow-md hover:shadow-lg '
+                'border border-gray-100 transition-all duration-300 '
+                'focus:ring-1 focus:ring-gray-200 focus:outline-none'
             ).on_click(increment).mark('increment-button')

@@ -1,34 +1,48 @@
 from nicegui.testing import User
 from nicegui import ui, app
 
-async def test_counter_page_loads(user: User) -> None:
-    """Test that counter page loads successfully"""
+async def test_counter_initialization(user: User) -> None:
+    """Test that counter initializes with zero"""
     await user.open('/')
     
-    # Check all required elements exist
-    await user.should_see(marker='title')
-    await user.should_see(marker='counter_display') 
-    await user.should_see(marker='increment_btn')
-    await user.should_see(marker='reset_btn')
+    # Check that counter displays 0 initially
+    await user.should_see('0')
+    
+    # Verify storage is initialized
+    assert app.storage.user['count'] == 0
 
-async def test_storage_initialization(user: User) -> None:
-    """Test that storage is properly initialized"""
+async def test_counter_increment(user: User) -> None:
+    """Test that counter increments when button is clicked"""
     await user.open('/')
     
-    # Check that storage is initialized with correct value
-    assert 'counter_value' in app.storage.user
-    assert app.storage.user['counter_value'] == 0
+    # Click increment button
+    user.find(marker='increment').click()
+    
+    # Check that counter shows 1
+    await user.should_see('1')
+    assert app.storage.user['count'] == 1
 
-async def test_ui_elements_exist(user: User) -> None:
-    """Test that UI elements are properly created"""
+async def test_multiple_increments(user: User) -> None:
+    """Test multiple increments work correctly"""
     await user.open('/')
     
-    # Check that we have the expected number of each element type
-    assert len(user.find(ui.label).elements) == 2  # title + counter display
-    assert len(user.find(ui.button).elements) == 2  # increment + reset
+    # Click increment button multiple times
+    for i in range(5):
+        user.find(marker='increment').click()
     
-    # Check specific markers exist
-    assert len(user.find(marker='title').elements) == 1
-    assert len(user.find(marker='counter_display').elements) == 1
-    assert len(user.find(marker='increment_btn').elements) == 1
-    assert len(user.find(marker='reset_btn').elements) == 1
+    # Check final count
+    await user.should_see('5')
+    assert app.storage.user['count'] == 5
+
+async def test_ui_elements_present(user: User) -> None:
+    """Test that required UI elements are present"""
+    await user.open('/')
+    
+    # Check counter display exists
+    await user.should_see(marker='counter')
+    
+    # Check increment button exists
+    await user.should_see(marker='increment')
+    
+    # Verify button shows the plus sign
+    await user.should_see('+')

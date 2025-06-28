@@ -8,33 +8,59 @@ def create():
             app.storage.user['count'] = 0
         
         def increment():
-            """Increment the counter and update display with toast notification"""
+            """Increment the counter with seamless visual feedback"""
             app.storage.user['count'] += 1
             counter_label.text = str(app.storage.user['count'])
             
-            # Show toast notification with feedback
+            # Ultra-minimal toast notification
             ui.notify(
-                f'Counter incremented to {app.storage.user["count"]}',
-                type='positive',
-                position='top-right',
-                timeout=2000,
-                close_button=True
+                f'{app.storage.user["count"]}',
+                type='info',
+                position='top',
+                timeout=800,
+                close_button=False,
+                color='transparent',
+                classes='text-red-400 font-thin text-lg backdrop-blur-sm bg-white/20 border-0 shadow-none'
             )
         
-        # Main container with minimal, clean background
-        with ui.column().classes('items-center justify-center min-h-screen gap-20 bg-gray-50'):
+        # Minimal full-screen layout
+        with ui.column().classes('items-center justify-center min-h-screen gap-32 bg-white'):
             
-            # Counter display - significantly larger and red
+            # Exceptionally large counter display with ultra-thin font
             counter_label = ui.label(str(app.storage.user['count'])).classes(
-                'text-[20rem] font-thin text-red-600 select-none tracking-wider '
-                'drop-shadow-lg transition-all duration-300 hover:text-red-700'
-            ).mark('counter-display')
+                'text-[24rem] font-thin text-red-500 select-none tracking-wide '
+                'transition-all duration-500 ease-out opacity-90 hover:opacity-100'
+            ).style('font-weight: 100; letter-spacing: 0.1em;').mark('counter-display')
             
-            # Circular increment button - clean and minimalist
-            ui.button('', icon='add').classes(
-                'w-16 h-16 rounded-full bg-white hover:bg-gray-100 '
-                'text-gray-600 hover:text-gray-700 shadow-md hover:shadow-lg '
-                'border-0 transition-all duration-200 ease-out '
-                'focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50 focus:outline-none '
-                'active:scale-95 hover:scale-105'
+            # Single elegant circular button - highly subtle
+            ui.button('').classes(
+                'w-20 h-20 rounded-full bg-transparent hover:bg-red-50/30 '
+                'border border-red-200/40 hover:border-red-300/60 '
+                'transition-all duration-300 ease-out '
+                'focus:outline-none focus:ring-1 focus:ring-red-200/50 '
+                'active:scale-95 hover:scale-102 '
+                'shadow-sm hover:shadow-md'
+            ).style(
+                'backdrop-filter: blur(2px);'
             ).on_click(increment).mark('increment-button')
+            
+        # Add custom styles for ultra-minimal aesthetic
+        ui.add_head_html('''
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300&display=swap');
+                
+                body {
+                    font-family: 'Inter', sans-serif;
+                    overflow: hidden;
+                }
+                
+                .q-notification {
+                    border-radius: 12px !important;
+                    backdrop-filter: blur(8px) !important;
+                }
+                
+                .q-btn:before {
+                    opacity: 0 !important;
+                }
+            </style>
+        ''')

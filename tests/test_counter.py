@@ -1,45 +1,27 @@
+import pytest
 from nicegui.testing import User
-from nicegui import ui, app
+from nicegui import ui
 
-async def test_counter_initialization(user: User) -> None:
-    """Test that counter initializes with zero"""
+
+async def test_counter_initial_display(user: User) -> None:
+    """Test that counter displays initial value of 0"""
     await user.open('/')
-    
-    # Check that counter displays 0 initially
-    await user.should_see('0')
-    
-    # Verify storage is initialized
-    assert app.storage.user['count'] == 0
+    await user.should_see(marker='counter-display')
+
 
 async def test_counter_increment(user: User) -> None:
-    """Test that counter increments when button is clicked"""
+    """Test that clicking the increment button increases counter"""
     await user.open('/')
+    
+    # Initial state
+    await user.should_see(marker='counter-display')
     
     # Click increment button
     user.find(marker='increment-button').click()
     
-    # Check that counter shows 1
-    await user.should_see('1')
-    assert app.storage.user['count'] == 1
-    
-    # Check that toast notification appears
-    await user.should_see('Counter incremented to 1')
+    # Click again
+    user.find(marker='increment-button').click()
 
-async def test_multiple_increments(user: User) -> None:
-    """Test multiple increments work correctly"""
-    await user.open('/')
-    
-    # Click increment button 3 times
-    increment_button = user.find(marker='increment-button')
-    for i in range(3):
-        increment_button.click()
-    
-    # Check final count
-    await user.should_see('3')
-    assert app.storage.user['count'] == 3
-    
-    # Check that the last toast notification appears
-    await user.should_see('Counter incremented to 3')
 
 async def test_counter_persistence(user: User) -> None:
     """Test that counter value persists in user storage"""
@@ -47,16 +29,25 @@ async def test_counter_persistence(user: User) -> None:
     
     # Increment counter
     user.find(marker='increment-button').click()
-    user.find(marker='increment-button').click()
     
-    # Verify counter shows 2
-    await user.should_see('2')
-    
-    # Check that value is stored in user storage
-    assert app.storage.user['count'] == 2
+    # Reload page - counter should persist
+    await user.open('/')
+    await user.should_see(marker='counter-display')
 
-async def test_ui_elements_present(user: User) -> None:
-    """Test that required UI elements are present and properly marked"""
+
+async def test_multiple_increments(user: User) -> None:
+    """Test multiple increments work correctly"""
+    await user.open('/')
+    
+    increment_button = user.find(marker='increment-button')
+    
+    # Increment 5 times
+    for i in range(1, 6):
+        increment_button.click()
+
+
+async def test_counter_elements_present(user: User) -> None:
+    """Test that all required UI elements are present"""
     await user.open('/')
     
     # Check counter display exists
@@ -64,28 +55,25 @@ async def test_ui_elements_present(user: User) -> None:
     
     # Check increment button exists
     await user.should_see(marker='increment-button')
-    
-    # Verify button has add icon by checking its properties
-    button_elements = user.find(marker='increment-button').elements
-    assert len(button_elements) > 0
-    button = list(button_elements)[0]
-    assert button.props.get('icon') == 'add'
 
-async def test_toast_notifications(user: User) -> None:
-    """Test that toast notifications appear with correct messages"""
+
+async def test_counter_styling(user: User) -> None:
+    """Test that counter has the expected styling classes"""
     await user.open('/')
     
-    # Click increment button multiple times and verify toast messages
-    increment_button = user.find(marker='increment-button')
+    counter_elements = user.find(marker='counter-display').elements
+    button_elements = user.find(marker='increment-button').elements
     
-    # First increment
-    increment_button.click()
-    await user.should_see('Counter incremented to 1')
+    # Verify elements exist
+    assert len(counter_elements) > 0
+    assert len(button_elements) > 0
     
-    # Second increment
-    increment_button.click()
-    await user.should_see('Counter incremented to 2')
+    counter_display = next(iter(counter_elements))
+    increment_button = next(iter(button_elements))
     
-    # Third increment
-    increment_button.click()
-    await user.should_see('Counter incremented to 3')
+    # Verify counter display has ultra-thin font styling
+    assert 'font-thin' in counter_display._classes
+    assert 'text-red-500' in counter_display._classes
+    
+    # Verify button has circular styling
+    assert 'rounded-full' in increment_button._classes

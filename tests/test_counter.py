@@ -21,6 +21,9 @@ async def test_counter_increment(user: User) -> None:
     # Check that counter shows 1
     await user.should_see('1')
     assert app.storage.user['count'] == 1
+    
+    # Check that toast notification appears
+    await user.should_see('Counter incremented to 1')
 
 async def test_multiple_increments(user: User) -> None:
     """Test multiple increments work correctly"""
@@ -34,6 +37,9 @@ async def test_multiple_increments(user: User) -> None:
     # Check final count
     await user.should_see('3')
     assert app.storage.user['count'] == 3
+    
+    # Check that the last toast notification appears
+    await user.should_see('Counter incremented to 3')
 
 async def test_counter_persistence(user: User) -> None:
     """Test that counter value persists in user storage"""
@@ -64,3 +70,22 @@ async def test_ui_elements_present(user: User) -> None:
     assert len(button_elements) > 0
     button = list(button_elements)[0]
     assert button.props.get('icon') == 'add'
+
+async def test_toast_notifications(user: User) -> None:
+    """Test that toast notifications appear with correct messages"""
+    await user.open('/')
+    
+    # Click increment button multiple times and verify toast messages
+    increment_button = user.find(marker='increment-button')
+    
+    # First increment
+    increment_button.click()
+    await user.should_see('Counter incremented to 1')
+    
+    # Second increment
+    increment_button.click()
+    await user.should_see('Counter incremented to 2')
+    
+    # Third increment
+    increment_button.click()
+    await user.should_see('Counter incremented to 3')
